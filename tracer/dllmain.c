@@ -5,6 +5,25 @@ VOID
 Init()
 {
     //
+	// Pin our module, so it does not get unloaded from the target process (with FreeLibrary for example).
+	// https://blog.syscall.party/2020/04/03/tampering-with-zooms-anti-tampering-library.html
+	//
+    HMODULE hSafeCheck = NULL;
+
+#ifdef _WIN64
+    const WCHAR* moduleName = L"gftrace.dll";
+#else
+    const WCHAR* moduleName = L"gftrace32.dll";
+#endif
+
+    BOOL IsPinned = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, moduleName, &hSafeCheck);
+
+    if (!IsPinned || hSafeCheck == NULL)
+    {
+        PrintWinError("Failed to pin module, might be vulnerable to unloading.", GetLastError());
+    }
+
+    //
     // Get kernel32.dll module base address.
     //
     HMODULE ModuleBase = GetModuleHandleW(L"kernel32.dll");
