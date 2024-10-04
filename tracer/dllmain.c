@@ -11,9 +11,9 @@ Init()
     HMODULE hSafeCheck = NULL;
 
 #ifdef _WIN64
-    const WCHAR* moduleName = L"gftrace.dll";
+    const WCHAR* moduleName = TEXT("gftrace.dll");
 #else
-    const WCHAR* moduleName = L"gftrace32.dll";
+    const WCHAR* moduleName = TEXT("gftrace32.dll");
 #endif
 
     BOOL IsPinned = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, moduleName, &hSafeCheck);
