@@ -217,10 +217,7 @@ IsSameStr(
 		char c1 = Str1[i];
 		char c2 = Str2[i];
 
-		c1 = tolower(c1);
-		c2 = tolower(c2);
-
-		if (c1 != c2)
+		if ((c1 | 0x20) != (c2 | 0x20))
 		{
 			return FALSE;
 		}
