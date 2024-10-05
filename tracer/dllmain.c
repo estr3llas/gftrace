@@ -5,15 +5,14 @@ VOID
 Init()
 {
     //
-	// Pin our module, so it does not get unloaded from the target process (with FreeLibrary for example).
-	// https://blog.syscall.party/2020/04/03/tampering-with-zooms-anti-tampering-library.html
+	// Pin our module, so it does not get unloaded from the target process (with FreeLibrary() for example).
 	//
     HMODULE hSafeCheck = NULL;
 
 #ifdef _WIN64
-    const WCHAR* moduleName = TEXT("gftrace.dll");
+    const LPCWSTR moduleName = TEXT("gftrace.dll");
 #else
-    const WCHAR* moduleName = TEXT("gftrace32.dll");
+    const LPCWSTR moduleName = TEXT("gftrace32.dll");
 #endif
 
     BOOL IsPinned = GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN, moduleName, &hSafeCheck);

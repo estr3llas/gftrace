@@ -139,7 +139,6 @@ GetExportAddr(
 
 	PLDR_DATA_TABLE_ENTRY CurrentModule = NULL;
 	PLIST_ENTRY CurrentEntry = Peb->Ldr->InLoadOrderModuleList.Flink;
-	FARPROC ExportAddr;
 
 	//
 	// Go through each loaded module and try to find the target export address using the given export name.
@@ -147,7 +146,7 @@ GetExportAddr(
 	while (CurrentEntry != &Peb->Ldr->InLoadOrderModuleList && CurrentEntry != NULL)
 	{
 		CurrentModule = CONTAINING_RECORD(CurrentEntry, LDR_DATA_TABLE_ENTRY, InLoadOrderLinks);
-		ExportAddr = ResolveExportAddr((ULONG_PTR)CurrentModule->DllBase, ExportName);
+		FARPROC ExportAddr = ResolveExportAddr((ULONG_PTR)CurrentModule->DllBase, ExportName);
 
 		if (ExportAddr != NULL)
 		{
