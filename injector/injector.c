@@ -1,21 +1,54 @@
 #include <stdio.h>
 #include <windows.h>
 
+#include "usage.h"
+#include "arguments.h"
+
 int main(int argc, char** argv)
 {
+    //
+    // Argument handling
+    //
     if (argc < 2)
     {
-        printf("Usage: gftrace.exe <file> <params>\n");
+        fprintf(stdout, "%s", USAGE);
         return 1;
     }
 
     LPSTR CmdLine = GetCommandLineA();
-    LPSTR ProcCmdLine = strchr(CmdLine, 0x20);
+
+    PROGRAMARGUMENTS args;
+	ZeroMemory(&args, sizeof(PROGRAMARGUMENTS));
+    for (unsigned int i = 1; i < (ULONG)argc; i++) {
+        //
+        // Iterate over argv and search for option.
+        //
+        if (strstr(argv[i], "-f")) {
+            mSetArg(args.s_args, file);
+            CmdLine = argv[i + 1];
+        }
+        if (strstr(argv[i], "-o")) mSetArg(args.s_args, output);
+        if (strstr(argv[i], "--help") || strstr(argv[i], "-h")) {
+            mSetArg(args.s_args, help);
+            fprintf(stdout, "%s", USAGE);
+            return 0;
+        }
+    }
 
     //
-    // Ignore all the spaces next to argv[0]
+    // Check if "-f" was used at all.
     //
-    while (*++ProcCmdLine == 0x20);
+    if (!mCheckArg(args.s_args, file)) {
+        fprintf(stdout, "%s", INVALID);
+        return 1;
+    }
+
+    // No valid arguments were inputed
+    if (args.s_args == 0) {
+        fprintf(stderr, "%s", INVALID);
+        return 1;
+    }
+
 
     PROCESS_INFORMATION ProcessInformation;
     STARTUPINFOA StartupInfo;
@@ -27,7 +60,7 @@ int main(int argc, char** argv)
     //
     // Create the target process in suspended state.
     //
-    if (!CreateProcessA(NULL, ProcCmdLine, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &StartupInfo, &ProcessInformation))
+    if (!CreateProcessA(NULL, CmdLine, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &StartupInfo, &ProcessInformation))
     {
         printf("[!] Failed to create the target process.\n[!] Error code: %u\n", GetLastError());
         return 1;
